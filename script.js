@@ -47,19 +47,29 @@ const usuarioOperacionesSesion = 'AUGCHA';
     }, 1000);
   }
   
-  // Ocultar splash screen a los 2000ms y mostrar login
+  // Ocultar splash screen a los 2000ms y mostrar la aplicación principal.
+  // Login comentado temporalmente para reactivarlo después.
   setTimeout(() => {
     if (splash) {
       splash.style.opacity = '0';
       setTimeout(() => {
         splash.remove();
-        const loginView = $('loginView');
-        if (loginView) loginView.classList.remove('hidden');
+
+        const greetingEl = document.querySelector('.hello');
+        if (greetingEl) {
+          greetingEl.textContent = `Hola ${usuarioOperacionesSesion}!`;
+        }
+
+        document.querySelectorAll('.topbar, .layout').forEach(el => {
+          el.classList.remove('hidden');
+        });
       }, 500);
     }
   }, 2000);
 })();
 
+/* LOGIN TEMPORALMENTE COMENTADO - INICIO
+   Se conserva este código para reactivarlo más adelante.
 // --- Lógica de Login ---
 let loginAttempts = 0;
 const MAX_ATTEMPTS = 3;
@@ -150,6 +160,8 @@ $('forgotPasswordBtn')?.addEventListener('click', e => {
 });
 $('loginUser')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
 $('loginPass')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
+
+LOGIN TEMPORALMENTE COMENTADO - FIN */
 
 function normalize(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-')}
 function formatDate(iso){return new Date(iso).toLocaleString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')}

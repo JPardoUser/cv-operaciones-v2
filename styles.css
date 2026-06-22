@@ -605,7 +605,9 @@
   }
 }
 
-/* Estilos del Login */
+/* Estilos del Login TEMPORALMENTE COMENTADOS - INICIO
+   Se conservan estos estilos para reactivarlos más adelante.
+Estilos del Login
 .login-overlay {
   position: fixed;
   inset: 0;
@@ -740,6 +742,8 @@
   font-size: 24px;
   font-weight: 700;
 }
+
+Estilos del Login TEMPORALMENTE COMENTADOS - FIN */
 
 /* Grilla de Operaciones */
 .ops-grid {
