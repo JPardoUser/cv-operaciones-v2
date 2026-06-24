@@ -169,12 +169,12 @@ function slaMinutes(s){const m=s.match(/(\d+)h\s*(\d+)?m?/i);return m?(+m[1]*60)
 function slaClass(item){if(item.estado==='Rechazado')return 'locked';return expired(item.sla)?'danger':'ok'}function slaLabel(item){if(item.estado==='Rechazado')return item.sla;return expired(item.sla)?'Caducado':item.sla}
 function unique(f){return [...new Set(cases.map(x=>x[f]).filter(v=>v!==null&&v!==undefined&&String(v).trim()!==''))].sort()}
 function fillSelect(id,f){const el=$(id); if(!el) return; unique(f).forEach(v=>el.insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`))}
-function fillEstado(){const el=$('filterEstado'); if(!el) return; ['Pendiente','Activado','Observado'].forEach(v=>el.insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`)); el.value='Pendiente'}
+function fillEstado(){const el=$('filterEstado'); if(!el) return; ['Pendiente','Activado','Observado','Rechazado'].forEach(v=>el.insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`)); el.value='Pendiente'}
 function estadoOperaciones(item){return item.estado === 'Subsanado' ? 'Pendiente' : item.estado}
 function getAnalistaLabel(item){return item.analistaOperaciones || 'Sin asignar'}
 function puedeTomarCaso(item){return estadoOperaciones(item) === 'Pendiente' && !item.analistaOperaciones}
 function render(data=cases){gridBody.innerHTML=data.map(item=>{const estado=estadoOperaciones(item);const canTake=puedeTomarCaso(item);const actionLabel=canTake?'Tomar caso':'Revisar';const analista=getAnalistaLabel(item);return `<tr><td>${item.solicitud}</td><td>${item.cliente}</td><td>${item.documento}</td><td>${item.concesionario}</td><td><strong>${item.usuario}</strong></td><td><span class="analyst-pill ${item.analistaOperaciones?'assigned':'unassigned'}">${analista}</span></td><td>${formatDate(item.fecha)}</td><td><span class="status ${normalize(estado)}">${estado}</span></td><td><button class="open-btn" type="button" data-id="${item.solicitud}" data-action="${canTake?'tomar':'ver'}">${actionLabel}</button></td></tr>`}).join('');
-resultCount.textContent=`${data.length} resultado${data.length===1?'':'s'}`;totalCases.textContent=data.length;summary.innerHTML=['Pendiente','Activado','Observado'].map(s=>`<span><i class="dot ${normalize(s)}"></i>${s} <strong>${data.filter(x=>estadoOperaciones(x)===s).length}</strong></span>`).join('');document.querySelectorAll('.open-btn').forEach(b=>b.addEventListener('click',()=>handleCaseAction(b.dataset.id,b.dataset.action)))}
+resultCount.textContent=`${data.length} resultado${data.length===1?'':'s'}`;totalCases.textContent=data.length;summary.innerHTML=['Pendiente','Activado','Observado','Rechazado'].map(s=>`<span><i class="dot ${normalize(s)}"></i>${s} <strong>${data.filter(x=>estadoOperaciones(x)===s).length}</strong></span>`).join('');document.querySelectorAll('.open-btn').forEach(b=>b.addEventListener('click',()=>handleCaseAction(b.dataset.id,b.dataset.action)))}
 function getFilters(){return{solicitud:$('filterSolicitud').value.trim().toUpperCase(),documento:$('filterDocumento').value.trim(),concesionario:$('filterConcesionario').value,usuario:$('filterUsuario').value.trim().toLowerCase(),analista:$('filterAnalista').value,estado:$('filterEstado').value||'Pendiente',desde:$('filterFechaDesde').value,hasta:$('filterFechaHasta').value}}
 function applyFilters(){const f=getFilters();render(cases.filter(i=>{const d=i.fecha.slice(0,10);const estado=estadoOperaciones(i);const analista=getAnalistaLabel(i);return(!f.solicitud||i.solicitud.includes(f.solicitud))&&(!f.documento||i.documento.includes(f.documento))&&(!f.concesionario||i.concesionario===f.concesionario)&&(!f.usuario||i.usuario.toLowerCase().includes(f.usuario))&&(!f.analista||analista===f.analista)&&(!f.estado||estado===f.estado)&&(!f.desde||d>=f.desde)&&(!f.hasta||d<=f.hasta)}))}
 function clearFilters(){['filterSolicitud','filterDocumento','filterConcesionario','filterUsuario','filterAnalista','filterFechaDesde','filterFechaHasta'].forEach(id=>{const el=$(id);if(el)el.value=''});if($('filterEstado'))$('filterEstado').value='Pendiente';applyFilters()}
@@ -324,11 +324,13 @@ function renderObservationBox() {
 
   const btnAprobar = $('btnAprobarActivarBantotal');
   const btnObservar = $('btnObservarOperaciones');
+  const btnRechazar = $('btnRechazarOperaciones');
 
   if (currentCase && currentCase.estado === 'Observado') {
     // Hide buttons
     if (btnAprobar) btnAprobar.classList.add('hidden');
     if (btnObservar) btnObservar.classList.add('hidden');
+    if (btnRechazar) btnRechazar.classList.add('hidden');
 
     // Setup details
     const motivo = currentCase.motivoObservacion || 'OM001 – Documentación contractual incompleta.';
@@ -351,11 +353,37 @@ function renderObservationBox() {
         </div>
       </div>
     `;
+  } else if (currentCase && currentCase.estado === 'Rechazado') {
+    // Hide buttons when rejected
+    if (btnAprobar) btnAprobar.classList.add('hidden');
+    if (btnObservar) btnObservar.classList.add('hidden');
+    if (btnRechazar) btnRechazar.classList.add('hidden');
+
+    const motivo = currentCase.motivoRechazo || currentCase.motivoObservacion || 'OM001 – Documentación contractual incompleta.';
+    const detalle = currentCase.comentarioRechazo || currentCase.comentarioObservacion || 'Solicitud rechazada por Operaciones.';
+    const fecha = currentCase.fechaRechazo || currentCase.fechaObservacion || getFormattedNow();
+    const analista = currentCase.analistaRechazo || currentCase.analistaObservacion || usuarioOperacionesSesion;
+
+    container.innerHTML = `
+      <div class="observation-alert-box" style="background-color: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; padding: 16px; font-family: inherit; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; color: #475569; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <span style="font-weight: 800; color: #0f172a;">Analista de Operaciones - ${analista}</span>
+            <span style="color: #64748b; margin-left: 8px;">${fecha}</span>
+          </div>
+          <span style="background-color: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; border: 1px solid #fecaca;">RECHAZO OPERACIONES</span>
+        </div>
+        <div style="font-size: 14px; color: #334155; line-height: 1.5;">
+          <p style="margin: 0 0 6px 0;"><strong>Motivo:</strong> ${motivo}</p>
+          <p style="margin: 0;"><strong>Detalle:</strong> ${detalle}</p>
+        </div>
+      </div>
+    `;
   } else {
-    // Show buttons if not approved/activated
-    const isApprovedOrActive = currentCase && currentCase.estado === 'Activado';
+    // Show buttons if not approved/activated/rejected
+    const isFinalState = currentCase && (currentCase.estado === 'Activado' || currentCase.estado === 'Rechazado');
     if (btnAprobar) {
-      if (isApprovedOrActive) {
+      if (isFinalState) {
         btnAprobar.classList.add('hidden');
       } else {
         btnAprobar.classList.remove('hidden');
@@ -363,11 +391,19 @@ function renderObservationBox() {
       }
     }
     if (btnObservar) {
-      if (isApprovedOrActive) {
+      if (isFinalState) {
         btnObservar.classList.add('hidden');
       } else {
         btnObservar.classList.remove('hidden');
         btnObservar.disabled = false;
+      }
+    }
+    if (btnRechazar) {
+      if (isFinalState) {
+        btnRechazar.classList.add('hidden');
+      } else {
+        btnRechazar.classList.remove('hidden');
+        btnRechazar.disabled = false;
       }
     }
 
@@ -375,6 +411,31 @@ function renderObservationBox() {
       <p style="color: #64748b; font-size: 0.95rem; margin-top: 10px; font-style: italic;">Sin observaciones registradas por operaciones.</p>
     `;
   }
+}
+
+
+function selectReadonly(value, options = []) {
+  const uniqueOptions = [...new Set([value, ...options].filter(v => v !== null && v !== undefined && String(v).trim() !== ''))];
+  return `<select disabled>${uniqueOptions.map(opt => `<option${opt === value ? ' selected' : ''}>${opt}</option>`).join('')}</select>`;
+}
+
+function readonlyField(label, value, extraClass = '', help = '') {
+  return `
+    <div class="ops-readonly-field ${extraClass}">
+      <label>${label}</label>
+      <input type="text" readonly value="${value}" />
+      ${help ? `<small class="field-help">${help}</small>` : ''}
+    </div>
+  `;
+}
+
+function readonlySelectField(label, value, options = [], extraClass = '') {
+  return `
+    <div class="ops-readonly-field ${extraClass}">
+      <label>${label}</label>
+      ${selectReadonly(value, options)}
+    </div>
+  `;
 }
 
 function buildOpsTabSection(tab) {
@@ -626,11 +687,10 @@ function buildOpsTabSection(tab) {
     const emailVal = parts.length >= 2 
       ? `${normalize(parts[0])}.${normalize(parts[1])}@email.com`
       : 'carlos.perez@email.com';
-
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
         <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Datos de Cliente</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Información personal e identificación del solicitante.</p>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Información de identificación y datos personales del solicitante.</p>
       </div>
       <div class="ops-tab-grid">
         <div class="ops-readonly-field">
@@ -756,6 +816,34 @@ function buildOpsTabSection(tab) {
         </div>
       </div>
     `;
+  } else if (tab === 'ingresos') {
+    html = `
+      <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Ingresos</h3>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Ingresos declarados por el titular para la validación operativa.</p>
+      </div>
+      <section class="executive-request-section" style="margin: 0;">
+        <p class="section-note">Registra los ingresos declarados por el titular.</p>
+        <div class="ops-tab-grid">
+          <div class="executive-income-card">
+            <span class="income-chip">Ingreso 1</span>
+            <div class="ops-tab-grid" style="padding: 0;">
+              ${readonlySelectField('Tipo de categoría', '5ta categoría', ['5ta categoría', '4ta categoría', 'Renta empresarial'])}
+              ${readonlySelectField('Perfil', 'Formal', ['Formal', 'Informal'])}
+              ${readonlySelectField('Situación laboral', 'Dependiente', ['Dependiente', 'Independiente'])}
+              ${readonlyField('Fecha de ingreso laboral', '01/01/2021')}
+              ${readonlyField('RUC del empleador', '20705695330')}
+              ${readonlyField('Ingreso neto mensual', 'S/ 20,000.00')}
+              ${readonlySelectField('¿Ingreso anualizado?', 'Sí', ['Sí', 'No'])}
+            </div>
+          </div>
+          <div class="executive-income-total">
+            <span>Total ingresos titular:</span>
+            <strong>S/ 20,000.00</strong>
+          </div>
+        </div>
+      </section>
+    `;
   } else if (tab === 'conyuge') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
@@ -813,12 +901,8 @@ function buildOpsTabSection(tab) {
           <input type="text" readonly value="${carretera}" />
         </div>
         <div class="ops-readonly-field">
-          <label>Score</label>
-          <input type="text" readonly value="780 (A+)" />
-        </div>
-        <div class="ops-readonly-field">
           <label>Segmento</label>
-          <input type="text" readonly value="Banca Persona" />
+          <input type="text" readonly value="A" />
         </div>
         <div class="ops-readonly-field">
           <label>Monto preaprobado</label>
@@ -839,14 +923,6 @@ function buildOpsTabSection(tab) {
         <div class="ops-readonly-field">
           <label>PLAFT</label>
           <input type="text" readonly value="Conforme" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>CMA</label>
-          <input type="text" readonly value="Aprobado" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Estado de evaluación</label>
-          <input type="text" readonly value="Completado" />
         </div>
         <div class="ops-readonly-field">
           <label>Analista</label>
@@ -880,7 +956,8 @@ function renderOpsTab(tab) {
   } else if (tab === 'cliente') {
     const bloquesCliente = [
       buildOpsTabSection('cliente'),
-      buildOpsTabSection('laborales')
+      buildOpsTabSection('laborales'),
+      buildOpsTabSection('ingresos')
     ];
     if (!currentCase || currentCase.estadoCivil === 'Casado') {
       bloquesCliente.push(buildOpsTabSection('conyuge'));
@@ -1109,6 +1186,9 @@ function updateGuaranteeVisibility(){
     } else if (currentCase.estado === 'Observado') {
       badge.className='check-badge observed';
       badge.textContent='Documentos observados';
+    } else if (currentCase.estado === 'Rechazado') {
+      badge.className='check-badge rejected';
+      badge.textContent='Solicitud rechazada';
     } else {
       badge.className='check-badge pending';
       badge.textContent='Pendiente de revisión';
@@ -1157,26 +1237,8 @@ function populateStageB() {
 
   generateCronograma(montoVal, plazoVal, cuotaVal, tasaVal);
 
-  let bank = 'Banco de Crédito (BCP)';
-  let account = '191-98765432-0-12';
-  if (concessionaire === 'HYUNDAI') {
-    bank = 'BBVA Continental';
-    account = '0011-0123-45678901-23';
-  }
-
-  if ($('poConcesionario')) $('poConcesionario').value = concessionaire;
-  if ($('poCliente')) $('poCliente').value = currentCase.cliente;
-  if ($('poDocumento')) $('poDocumento').value = `DNI — ${currentCase.documento}`;
-  if ($('poSolicitud')) $('poSolicitud').value = sol;
-  if ($('poPrecioVehiculo')) $('poPrecioVehiculo').value = 'S/ 158,000.00';
-  if ($('poCuotaInicial')) $('poCuotaInicial').value = 'S/ 20,000.00';
-  if ($('poMontoDesembolsar')) $('poMontoDesembolsar').value = montoVal;
-  if ($('poNumCuenta')) $('poNumCuenta').value = account;
-  if ($('poBanco')) $('poBanco').value = bank;
-
   if ($('bantotalSection')) $('bantotalSection').classList.remove('hidden');
   if ($('activationResultSection')) $('activationResultSection').classList.remove('hidden');
-  if ($('paymentOrderSection')) $('paymentOrderSection').classList.remove('hidden');
 }
 function updateRegisterGuaranteeButton(){
   const guarantee=$('guaranteeSection');
@@ -1357,7 +1419,7 @@ function openDetail(id){
   
   if($('btnAprobarActivarBantotal')) $('btnAprobarActivarBantotal').disabled = false;
   if($('btnObservarOperaciones')) $('btnObservarOperaciones').disabled = false;
-  if($('btnGenerarOrdenPago')) $('btnGenerarOrdenPago').disabled = false;
+  if($('btnRechazarOperaciones')) $('btnRechazarOperaciones').disabled = false;
 
   $('detailSolicitud').textContent=currentCase.solicitud;
   if($('detailCarretera'))$('detailCarretera').textContent=currentCase.carretera;
@@ -1409,15 +1471,13 @@ function openDetail(id){
   if (currentCase.estado === 'Activado') {
     if($('btnAprobarActivarBantotal')) $('btnAprobarActivarBantotal').disabled = true;
     if($('btnObservarOperaciones')) $('btnObservarOperaciones').disabled = true;
+    if($('btnRechazarOperaciones')) $('btnRechazarOperaciones').disabled = true;
     
     $('stageAPanel').classList.add('hidden');
     $('stageBPanel').classList.remove('hidden');
     $('detailHeaderTitle').textContent = "Activación Bantotal";
     
     populateStageB();
-    if ($('btnGenerarOrdenPago')) {
-      $('btnGenerarOrdenPago').disabled = (currentCase.estado === 'Aprobado');
-    }
   } else {
     $('stageAPanel').classList.remove('hidden');
     $('stageBPanel').classList.add('hidden');
@@ -1504,27 +1564,6 @@ $('backToInbox').addEventListener('click',intentarRegresarABandeja);document.que
 if($('btnObserveExecutive')) $('btnObserveExecutive').addEventListener('click',()=>showModal('Observación enviada','Se registró la observación y el caso será devuelto al ejecutivo para subsanación.'));
 
 if ($('btnDescargarCronograma')) $('btnDescargarCronograma').addEventListener('click', downloadCronogramaPdf);
-if ($('btnGenerarOrdenPago')) {
-  $('btnGenerarOrdenPago').addEventListener('click', () => {
-    showModal(
-      'Confirmar envío',
-      '¿Está seguro de que desea generar la salida para la orden de pago?',
-      'confirm',
-      true,
-      () => {
-        showModal('Envío Exitoso', 'Se generó la salida para la orden de pago de manera exitosa.', 'success');
-        currentCase.estado = 'Aprobado';
-        saveCases();
-        fillAnalistaFilter();
-        renderTracking();
-        render();
-        if ($('btnGenerarOrdenPago')) {
-          $('btnGenerarOrdenPago').disabled = true;
-        }
-      }
-    );
-  });
-}
 
 if ($('btnRegresarBandeja')) {
   $('btnRegresarBandeja').addEventListener('click', () => {
@@ -1538,19 +1577,34 @@ $('closeModal').addEventListener('click',()=>modal.classList.add('hidden'));$('a
 // --- Nuevas Acciones de Operaciones ---
 $('btnRegresarBandejaOps')?.addEventListener('click',intentarRegresarABandeja);
 
-// --- Modal de Observación Event Listeners ---
+// --- Modal de Observación / Rechazo Event Listeners ---
 const observarModal = $('observarModal');
 const closeObservarModal = $('closeObservarModal');
 const cancelObservarModal = $('cancelObservarModal');
 const confirmObservarModal = $('confirmObservarModal');
 const observarMotivo = $('observarMotivo');
 const observarComentario = $('observarComentario');
+const observarModalTitle = $('observarModalTitle');
+const observarMotivoLabel = $('observarMotivoLabel');
+let accionModalOperaciones = 'observar';
 
-$('btnObservarOperaciones')?.addEventListener('click', () => {
+function abrirModalDecisionOperaciones(accion) {
+  accionModalOperaciones = accion;
+  const esRechazo = accion === 'rechazar';
+
+  if (observarModalTitle) observarModalTitle.textContent = esRechazo ? 'Rechazar Solicitud' : 'Observar Solicitud';
+  if (observarMotivoLabel) observarMotivoLabel.textContent = esRechazo ? 'Motivo de Rechazo *' : 'Motivo de la observación *';
+  if (confirmObservarModal) {
+    confirmObservarModal.textContent = esRechazo ? 'Confirmar Rechazo' : 'Confirmar Observación';
+    confirmObservarModal.style.background = esRechazo ? '#991b1b' : '#ea580c';
+  }
   if (observarMotivo) observarMotivo.value = '';
   if (observarComentario) observarComentario.value = '';
   if (observarModal) observarModal.classList.remove('hidden');
-});
+}
+
+$('btnObservarOperaciones')?.addEventListener('click', () => abrirModalDecisionOperaciones('observar'));
+$('btnRechazarOperaciones')?.addEventListener('click', () => abrirModalDecisionOperaciones('rechazar'));
 
 closeObservarModal?.addEventListener('click', () => {
   if (observarModal) observarModal.classList.add('hidden');
@@ -1563,32 +1617,47 @@ cancelObservarModal?.addEventListener('click', () => {
 confirmObservarModal?.addEventListener('click', () => {
   const motivo = observarMotivo.value;
   const comentario = observarComentario.value.trim();
+  const esRechazo = accionModalOperaciones === 'rechazar';
 
   if (!motivo) {
-    showModal('Campo Requerido', 'Por favor, seleccione el motivo de la observación.', 'warning');
+    showModal('Campo Requerido', esRechazo ? 'Por favor, seleccione el motivo de rechazo.' : 'Por favor, seleccione el motivo de la observación.', 'warning');
     return;
   }
   if (!comentario) {
-    showModal('Campo Requerido', 'Por favor, ingrese un comentario para la observación.', 'warning');
+    showModal('Campo Requerido', esRechazo ? 'Por favor, ingrese un comentario para el rechazo.' : 'Por favor, ingrese un comentario para la observación.', 'warning');
     return;
   }
 
   if (currentCase) {
-    currentCase.estado = 'Observado';
-    currentCase.motivoObservacion = motivo;
-    currentCase.comentarioObservacion = comentario;
-    currentCase.fechaObservacion = getFormattedNow();
-    currentCase.analistaObservacion = usuarioOperacionesSesion;
+    const fechaDecision = getFormattedNow();
     currentCase.historialOperaciones = currentCase.historialOperaciones || [];
-    currentCase.historialOperaciones.push({rol:'Analista de Operaciones',usuario:usuarioOperacionesSesion,fecha:currentCase.fechaObservacion,comentario:`Observado: ${motivo} - ${comentario}`});
+
+    if (esRechazo) {
+      currentCase.estado = 'Rechazado';
+      currentCase.motivoRechazo = motivo;
+      currentCase.comentarioRechazo = comentario;
+      currentCase.fechaRechazo = fechaDecision;
+      currentCase.analistaRechazo = usuarioOperacionesSesion;
+      currentCase.historialOperaciones.push({rol:'Analista de Operaciones',usuario:usuarioOperacionesSesion,fecha:currentCase.fechaRechazo,comentario:`Rechazado: ${motivo} - ${comentario}`});
+    } else {
+      currentCase.estado = 'Observado';
+      currentCase.motivoObservacion = motivo;
+      currentCase.comentarioObservacion = comentario;
+      currentCase.fechaObservacion = fechaDecision;
+      currentCase.analistaObservacion = usuarioOperacionesSesion;
+      currentCase.historialOperaciones.push({rol:'Analista de Operaciones',usuario:usuarioOperacionesSesion,fecha:currentCase.fechaObservacion,comentario:`Observado: ${motivo} - ${comentario}`});
+    }
+
     saveCases();
     fillAnalistaFilter();
 
     if (observarModal) observarModal.classList.add('hidden');
     
     applyFilters(); // Update inbox grid
+    renderChecklist();
     renderObservationBox(); // Update current view card & buttons
-    showModal('Solicitud Observada', 'La solicitud ha sido observada y devuelta al Ejecutivo de manera exitosa.');
+    renderTracking();
+    showModal(esRechazo ? 'Solicitud Rechazada' : 'Solicitud Observada', esRechazo ? 'La solicitud ha sido rechazada de manera exitosa.' : 'La solicitud ha sido observada y devuelta al Ejecutivo de manera exitosa.');
   }
 });
 
@@ -1617,6 +1686,7 @@ $('btnAprobarActivarBantotal')?.addEventListener('click',()=>{
   
   if($('btnAprobarActivarBantotal')) $('btnAprobarActivarBantotal').disabled = true;
   if($('btnObservarOperaciones')) $('btnObservarOperaciones').disabled = true;
+  if($('btnRechazarOperaciones')) $('btnRechazarOperaciones').disabled = true;
 
   window.scrollTo({top:0,behavior:'smooth'});
 });

@@ -287,6 +287,9 @@
                 <button id="btnObservarOperaciones" class="btn secondary" type="button" style="height: 48px; font-size: 14px; font-weight: 800; background: #ef4444; color: white; border: none; cursor: pointer; border-radius: 13px; min-width: 150px;">
                   ⚠ OBSERVAR
                 </button>
+                <button id="btnRechazarOperaciones" class="btn secondary" type="button" style="height: 48px; font-size: 14px; font-weight: 800; background: #991b1b; color: white; border: none; cursor: pointer; border-radius: 13px; min-width: 150px;">
+                  ✕ RECHAZAR
+                </button>
                 <button id="btnRegresarBandejaOps" class="btn outline" type="button" style="height: 48px; font-size: 14px; color: var(--blue-dark); border-color: var(--blue); min-width: 120px;">
                   Regresar
                 </button>
@@ -451,48 +454,6 @@
               </div>
             </section>
 
-            <!-- Datos de salida para orden de pago -->
-            <section id="paymentOrderSection" class="card payment-order-card">
-              <div class="table-header">
-                <div>
-                  <h2>Datos de salida para orden de pago</h2>
-                </div>
-              </div>
-
-              <div class="bantotal-grid">
-                <label>Concesionario
-                  <input type="text" id="poConcesionario" readonly placeholder="Nombre concesionario" />
-                </label>
-                <label>Cliente
-                  <input type="text" id="poCliente" readonly placeholder="Nombre cliente" />
-                </label>
-                <label>Tipo / N° documento
-                  <input type="text" id="poDocumento" readonly placeholder="DNI / CE — número" />
-                </label>
-                <label>N° solicitud
-                  <input type="text" id="poSolicitud" readonly placeholder="Ej. EFE001" />
-                </label>
-                <label>Precio del vehículo
-                  <input type="text" id="poPrecioVehiculo" readonly placeholder="USD ___,___" />
-                </label>
-                <label>Cuota inicial
-                  <input type="text" id="poCuotaInicial" readonly placeholder="USD ___,___" />
-                </label>
-                <label>Monto a desembolsar (USD)
-                  <input type="text" id="poMontoDesembolsar" readonly placeholder="USD ___,___" />
-                </label>
-                <label>N° de cuenta
-                  <input type="text" id="poNumCuenta" readonly placeholder="Número cuenta concesionario" />
-                </label>
-                <label>Banco
-                  <input type="text" id="poBanco" readonly placeholder="Banco concesionario" />
-                </label>
-              </div>
-
-              <div class="payment-order-actions" style="margin-top: 18px;">
-                <button id="btnGenerarOrdenPago" class="btn primary" type="button">Generar salida para orden de pago</button>
-              </div>
-            </section>
 
             <!-- Botón de regreso -->
             <div style="margin-top: 24px; margin-bottom: 24px; display: flex; justify-content: flex-start;">
@@ -566,12 +527,12 @@
   <div id="observarModal" class="modal hidden" role="dialog" aria-modal="true" style="z-index: 100000; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
     <div class="modal-card" style="background: white; padding: 24px; border-radius: 20px; width: 90%; max-width: 500px; text-align: left; box-shadow: var(--shadow-xl); border: 1px solid var(--line); position: relative; margin: auto;">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 20px;">
-        <h3 style="margin: 0; color: #003893; font-size: 1.3rem; font-weight: 800;">Observar Solicitud</h3>
+        <h3 id="observarModalTitle" style="margin: 0; color: #003893; font-size: 1.3rem; font-weight: 800;">Observar Solicitud</h3>
         <button id="closeObservarModal" type="button" style="border: 0; background: transparent; font-size: 28px; cursor: pointer; color: #64748b; line-height: 1;">×</button>
       </div>
       
       <div style="margin-bottom: 20px;">
-        <label for="observarMotivo" style="display: block; font-weight: 800; font-size: 12px; color: #1e293b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Motivo de la observación *</label>
+        <label id="observarMotivoLabel" for="observarMotivo" style="display: block; font-weight: 800; font-size: 12px; color: #1e293b; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Motivo de la observación *</label>
         <select id="observarMotivo" style="width: 100%; height: 48px; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 0 12px; font-family: inherit; font-size: 14px; color: #1e293b; background: white; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23003893%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right%2016px%20center; background-size: 10px%20auto;">
           <option value="">Seleccionar motivo...</option>
           <option value="OM001 – Documentación contractual incompleta.">OM001 – Documentación contractual incompleta.</option>

@@ -441,18 +441,6 @@
   }
 }
 
-/* Datos de salida para orden de pago */
-.payment-order-card {
-  margin-top: 24px;
-}
-.payment-order-card h2 {
-  font-size: 14px;
-  font-weight: 800;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 0;
-}
 .onboarding-alert-banner {
   background: #f0f6ff;
   border-left: 4.5px solid #3b82f6;
@@ -502,40 +490,6 @@
   padding: 4px 12px;
   border-radius: 999px;
   display: inline-block;
-}
-.payment-order-card input[readonly] {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  color: #334155;
-  font-weight: 700;
-}
-.payment-order-card input::placeholder {
-  color: #94a3b8;
-  font-style: italic;
-  font-weight: 500;
-}
-.payment-order-actions {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 24px;
-}
-#btnGenerarOrdenPago {
-  background: #1e3a8a;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 14px;
-  height: 46px;
-  padding: 0 24px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
-}
-#btnGenerarOrdenPago:hover {
-  background: #1d4ed8;
-  box-shadow: 0 6px 16px rgba(30, 58, 138, 0.3);
-  transform: translateY(-1px);
 }
 
 /* Estilos para los campos de formulario en las pestañas */
@@ -1218,7 +1172,7 @@ th{font-size:11.5px!important;}
 .bantotal-grid label{font-size:12.5px!important;}
 .bantotal-grid input{height:36px!important;border-radius:10px!important;font-size:12.5px!important;}
 .cronograma-details-wrapper{margin-top:16px!important;padding-top:14px!important;}
-.payment-order-actions,.cronograma-actions-bottom{margin-top:12px!important;}
+.cronograma-actions-bottom{margin-top:12px!important;}
 .modal-card{border-radius:16px!important;padding:20px!important;}
 
 @media(max-width:1100px){.ops-main-layout{grid-template-columns:1fr!important}.tracking-panel{min-width:0!important;position:relative!important;top:auto!important}.ops-section-tabs{grid-template-columns:repeat(2,1fr)!important}}
@@ -1226,3 +1180,110 @@ th{font-size:11.5px!important;}
 
 @media(max-width:1100px){.ops-tab-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
 @media(max-width:760px){.ops-tab-grid{grid-template-columns:1fr!important;}}
+
+/* Estado visual para solicitud rechazada en checklist */
+.check-badge.rejected{background:#fee2e2;color:#b91c1c;}
+
+
+/* Sección de datos enviados por Ejecutivo Financiero */
+.executive-request-wrapper {
+  display: grid;
+  gap: 18px;
+}
+.executive-request-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 14px;
+  border: 1.5px solid #dbeafe;
+  border-radius: 16px;
+  background: #f8fbff;
+}
+.executive-request-summary .summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.executive-request-summary .summary-item small {
+  color: #003893;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.executive-request-summary .summary-item strong {
+  color: #001b54;
+  font-size: 13px;
+  font-weight: 900;
+}
+.executive-request-section {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 18px;
+  background: #ffffff;
+}
+.executive-request-section h3 {
+  margin: 0 0 6px;
+  color: #002d72;
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.executive-request-section .section-note {
+  margin: 0 0 14px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+}
+.executive-income-card {
+  grid-column: 1 / -1;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px;
+  background: #f8fafc;
+}
+.executive-income-card .income-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-weight: 900;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.executive-income-total {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1.5px solid #e2e8f0;
+  color: #001b54;
+  font-weight: 900;
+}
+.executive-add-income-btn {
+  height: 42px;
+  border: 0;
+  border-radius: 12px;
+  background: #64748b;
+  color: #ffffff;
+  font-weight: 900;
+  padding: 0 18px;
+  cursor: not-allowed;
+}
+.ops-readonly-field .field-help {
+  margin-top: -2px;
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.35;
+}
+@media(max-width:1100px){
+  .executive-request-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:760px){
+  .executive-request-summary{grid-template-columns:1fr;}
+  .executive-income-total{flex-direction:column;}
+}
