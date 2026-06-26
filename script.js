@@ -1,9 +1,9 @@
 const defaultCases=[
-{solicitud:'EFE001',cliente:'Pérez Salazar Juan Carlos',documento:'12345678',concesionario:'TOYOTA',tienda:'PURUCHUCO',usuario:'jgonzalesf',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',sla:'02h 20m',estadoCivil:'Casado',analistaOperaciones:null,fechaToma:null,historialOperaciones:[]},
-{solicitud:'EFE002',cliente:'Melgar Salazar José Carlos',documento:'12345678',concesionario:'HYUNDAI',tienda:'SAN MIGUEL',usuario:'tramirezp',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',sla:'01h 10m',estadoCivil:'Soltero',subsanado:true,analistaOperaciones:null,fechaToma:null,historialOperaciones:[{rol:'Ejecutivo Financiero',usuario:'TRAMIREZP',fecha:'17/06/2026 11:35',comentario:'Se subsanaron los documentos observados y se reenvía a Operaciones para validación.'}]},
-{solicitud:'EFE003',cliente:'Pérez García Pedro Juan',documento:'12345678',concesionario:'TOYOTA',tienda:'LA MOLINA',usuario:'jgonzalesf',carretera:'Semi Full',fecha:'2026-05-20T15:30:00',estado:'Activado',sla:'00h 35m',estadoCivil:'Soltero',analistaOperaciones:'AUGCHA',fechaToma:'16/06/2026 10:20',historialOperaciones:[{rol:'Analista de Operaciones',usuario:'AUGCHA',fecha:'16/06/2026 10:42',comentario:'Solicitud aprobada y activada en Bantotal.'}]},
-{solicitud:'POP001',cliente:'Pérez Salazar Felipe Carlos',documento:'12345678',concesionario:'HYUNDAI',tienda:'PURUCHUCO',usuario:'jpardol',carretera:'Express',fecha:'2026-05-20T15:30:00',estado:'Observado',sla:'06h 05m',estadoCivil:'Divorciado',analistaOperaciones:'AUGCHA',fechaToma:'16/06/2026 14:10',motivoObservacion:'OM001 – Documentación contractual incompleta.',comentarioObservacion:'Falta adjuntar copia legible de los documentos firmados para formalización.',fechaObservacion:'16/06/2026 14:58',analistaObservacion:'AUGCHA',historialOperaciones:[{rol:'Analista de Operaciones',usuario:'AUGCHA',fecha:'16/06/2026 14:58',comentario:'Solicitud observada por documentación contractual incompleta.'}]},
-{solicitud:'POP002',cliente:'Toledo Salazar Rafael Carlos',documento:'12345678',concesionario:'TOYOTA',tienda:'SAN MIGUEL',usuario:'jpardol',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',sla:'08h 40m',estadoCivil:'Soltero',subsanado:true,analistaOperaciones:null,fechaToma:null,historialOperaciones:[{rol:'Ejecutivo Financiero',usuario:'JPARDOL',fecha:'17/06/2026 16:25',comentario:'Caso subsanado por el ejecutivo y reenviado a la bandeja general de Operaciones.'}]}
+{solicitud:'EFE001',cliente:'Pérez Salazar Juan Carlos',documento:'12345678',concesionario:'TOYOTA',tienda:'PURUCHUCO',usuario:'jgonzalesf',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',estadoCivil:'Casado',analistaOperaciones:null,fechaToma:null,historialOperaciones:[]},
+{solicitud:'EFE002',cliente:'Melgar Salazar José Carlos',documento:'12345678',concesionario:'HYUNDAI',tienda:'SAN MIGUEL',usuario:'tramirezp',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',estadoCivil:'Soltero',subsanado:true,analistaOperaciones:null,fechaToma:null,historialOperaciones:[{rol:'Ejecutivo Financiero',usuario:'TRAMIREZP',fecha:'17/06/2026 11:35',comentario:'Se subsanaron los documentos observados y se reenvía a Operaciones para validación.'}]},
+{solicitud:'EFE003',cliente:'Pérez García Pedro Juan',documento:'12345678',concesionario:'TOYOTA',tienda:'LA MOLINA',usuario:'jgonzalesf',carretera:'Semi Full',fecha:'2026-05-20T15:30:00',estado:'Activado',estadoCivil:'Soltero',analistaOperaciones:'AUGCHA',fechaToma:'16/06/2026 10:20',historialOperaciones:[{rol:'Analista de Operaciones',usuario:'AUGCHA',fecha:'16/06/2026 10:42',comentario:'Solicitud aprobada y activada en Bantotal.'}]},
+{solicitud:'POP001',cliente:'Pérez Salazar Felipe Carlos',documento:'12345678',concesionario:'HYUNDAI',tienda:'PURUCHUCO',usuario:'jpardol',carretera:'Express',fecha:'2026-05-20T15:30:00',estado:'Observado',estadoCivil:'Divorciado',analistaOperaciones:'AUGCHA',fechaToma:'16/06/2026 14:10',motivoObservacion:'OM001 – Documentación contractual incompleta.',comentarioObservacion:'Falta adjuntar copia legible de los documentos firmados para formalización.',fechaObservacion:'16/06/2026 14:58',analistaObservacion:'AUGCHA',historialOperaciones:[{rol:'Analista de Operaciones',usuario:'AUGCHA',fecha:'16/06/2026 14:58',comentario:'Solicitud observada por documentación contractual incompleta.'}]},
+{solicitud:'POP002',cliente:'Toledo Salazar Rafael Carlos',documento:'12345678',concesionario:'TOYOTA',tienda:'SAN MIGUEL',usuario:'jpardol',carretera:'Full',fecha:'2026-05-20T15:30:00',estado:'Pendiente',estadoCivil:'Soltero',subsanado:true,analistaOperaciones:null,fechaToma:null,historialOperaciones:[{rol:'Ejecutivo Financiero',usuario:'JPARDOL',fecha:'17/06/2026 16:25',comentario:'Caso subsanado por el ejecutivo y reenviado a la bandeja general de Operaciones.'}]}
 ];
 
 const OPERACIONES_STORAGE_KEY = 'efe_operaciones_cases';
@@ -165,8 +165,6 @@ LOGIN TEMPORALMENTE COMENTADO - FIN */
 
 function normalize(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-')}
 function formatDate(iso){return new Date(iso).toLocaleString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')}
-function slaMinutes(s){const m=s.match(/(\d+)h\s*(\d+)?m?/i);return m?(+m[1]*60)+ +(m[2]||0):0}function expired(s){return slaMinutes(s)>240}
-function slaClass(item){if(item.estado==='Rechazado')return 'locked';return expired(item.sla)?'danger':'ok'}function slaLabel(item){if(item.estado==='Rechazado')return item.sla;return expired(item.sla)?'Caducado':item.sla}
 function unique(f){return [...new Set(cases.map(x=>x[f]).filter(v=>v!==null&&v!==undefined&&String(v).trim()!==''))].sort()}
 function fillSelect(id,f){const el=$(id); if(!el) return; unique(f).forEach(v=>el.insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`))}
 function fillEstado(){const el=$('filterEstado'); if(!el) return; ['Pendiente','Activado','Observado','Rechazado'].forEach(v=>el.insertAdjacentHTML('beforeend',`<option value="${v}">${v}</option>`)); el.value='Pendiente'}
@@ -439,198 +437,70 @@ function readonlySelectField(label, value, options = [], extraClass = '') {
 }
 
 function buildOpsTabSection(tab) {
-  const numDoc = currentCase ? currentCase.documento : '12345678';
-  const nameCli = currentCase ? currentCase.cliente : 'Pérez Salazar Juan Carlos';
-  const codSol = currentCase ? currentCase.solicitud : 'EFE001';
-  const concessionaire = currentCase ? currentCase.concesionario : 'TOYOTA';
-  const tienda = currentCase ? currentCase.tienda : 'PURUCHUCO';
-  const usuario = currentCase ? currentCase.usuario : 'jgonzalesf';
   const carretera = currentCase ? currentCase.carretera : 'Full';
-  const estadoCivil = currentCase ? (currentCase.estadoCivil || 'Soltero') : 'Soltero';
-
   let html = '';
-  if (tab === 'comerciales') {
+
+  if (tab === 'comerciales' || tab === 'vehiculo') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Datos Comerciales</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Detalles del concesionario, tienda, ejecutivo de ventas y campaña comercial.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Datos de Vehículo</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Concesionario</label>
-          <input type="text" readonly value="${concessionaire}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Tienda / Sucursal</label>
-          <input type="text" readonly value="${tienda}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Vendedor</label>
-          <input type="text" readonly value="${usuario.toUpperCase()}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Producto</label>
-          <input type="text" readonly value="Crédito vehicular PN" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Campaña seleccionada</label>
-          <input type="text" readonly value="SUV Mayo 2026" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Beneficio de campaña</label>
-          <input type="text" readonly value="Bono de equipamiento de USD 1,000" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha inicio campaña</label>
-          <input type="text" readonly value="01/05/2026" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha fin campaña</label>
-          <input type="text" readonly value="31/05/2026" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Estado vehículo', 'Nuevo')}
+        ${readonlyField('Concesionario', 'Hyundai')}
+        ${readonlyField('Sucursal', 'Puruchuco')}
+        ${readonlyField('Tipo Doc. vendedor', 'DNI')}
+        ${readonlyField('N° Doc vendedor', 'Ingrese documento')}
+        ${readonlyField('Nombre completo vendedor', 'ALOCHA')}
+        ${readonlyField('Marca', 'Toyota')}
+        ${readonlyField('Modelo', 'Corolla')}
+        ${readonlyField('Año modelo', '2026')}
+        ${readonlyField('Tarjeta propiedad a nombre de', 'Titular')}
       </div>
     `;
   } else if (tab === 'credito') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Crédito y Simulación</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Condiciones financieras aprobadas y estructuración de la deuda.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Crédito y Simulación</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Precio del vehículo</label>
-          <input type="text" readonly value="S/ ${concessionaire === 'TOYOTA' ? '158,000.00' : '138,000.00'}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Monto inicial</label>
-          <input type="text" readonly value="S/ 20,000.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Total financiamiento</label>
-          <input type="text" readonly value="S/ 138,000.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Moneda financiamiento</label>
-          <input type="text" readonly value="Soles (S/)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Tipo de cambio</label>
-          <input type="text" readonly value="3.75" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>TEA</label>
-          <input type="text" readonly value="14.90%" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Plazo</label>
-          <input type="text" readonly value="36 cuotas" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Día de pago</label>
-          <input type="text" readonly value="22 de cada mes" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Cuota estimada</label>
-          <input type="text" readonly value="S/ 4,123.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Total financiado con gastos</label>
-          <input type="text" readonly value="S/ 141,400.00" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Producto', 'Crédito Vehicular')}
+        ${readonlyField('Campaña comercial', 'SUV Mayo 2026')}
+        ${readonlyField('Moneda Financiamiento', 'Soles (S/)')}
+        ${readonlyField('Tipo Cambio', '3.78')}
+        ${readonlyField('Precio Vehículo', '$ 15,000.00')}
+        ${readonlyField('Cuota Inicial', '$ 6,500.00')}
+        ${readonlyField('TEA', '12.80%')}
+        ${readonlyField('Plazo Meses', '24 meses')}
+        ${readonlyField('Día Pago', '03')}
+        ${readonlyField('Total Financiamiento', 'S/ 32,130.00')}
       </div>
     `;
   } else if (tab === 'gastos') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Gastos y GPS</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Costos registrales, notariales, portes y financiamiento del GPS.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Gastos y Plan GPS</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Gastos notariales</label>
-          <input type="text" readonly value="S/ 350.00 (Aplicado)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Gastos registrales</label>
-          <input type="text" readonly value="S/ 800.00 (Aplicado)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Gastos delivery firmas</label>
-          <input type="text" readonly value="S/ 150.00 (Aplicado)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Plan GPS</label>
-          <input type="text" readonly value="Premium 3 Años" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Gastos inclusión GPS</label>
-          <input type="text" readonly value="S/ 950.00 (Financiado)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Kit mantenimiento prepagado</label>
-          <input type="text" readonly value="No aplica" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Portes</label>
-          <input type="text" readonly value="S/ 15.00 (Mensual)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Otros conceptos financieros</label>
-          <input type="text" readonly value="Seguro de Neumáticos (S/ 350.00)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Indicador de aplicación</label>
-          <input type="text" readonly value="Sí" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Importe aplicable</label>
-          <input type="text" readonly value="S/ 350.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Indicador de financiamiento</label>
-          <input type="text" readonly value="Sí (Financiado)" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Gastos Notariales', 'Sí')}
+        ${readonlyField('Gastos Registrales (sábana)', 'Sí')}
+        ${readonlyField('Gastos Delivery Firma', 'Sí')}
+        ${readonlyField('Plan GPS', 'Premium')}
+        ${readonlyField('Gastos Inclusión GPS (cálculo)', '$ 650.00')}
+        ${readonlyField('Cuotas Dobles', 'No')}
+        ${readonlyField('Incluir Portes', 'No')}
       </div>
     `;
   } else if (tab === 'seguros') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Seguros</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Detalles de las pólizas de seguro vehicular y desgravamen.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Seguros</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Seguro vehicular</label>
-          <input type="text" readonly value="Endosado (Rimac Seguros)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Costo seguro vehicular</label>
-          <input type="text" readonly value="USD 1,200.00 (Anual)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Seguro desgravamen</label>
-          <input type="text" readonly value="Sí (Aplicado)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Producto desgravamen</label>
-          <input type="text" readonly value="Individual" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Costo seguro desgravamen</label>
-          <input type="text" readonly value="S/ 45.00 (Mensual)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Seguro optativo</label>
-          <input type="text" readonly value="No" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Costo seguro optativo</label>
-          <input type="text" readonly value="S/ 0.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Tipo seguro optativo</label>
-          <input type="text" readonly value="No aplica" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Seguro Vehicular', 'Con seguro')}
+        ${readonlyField('Costo Seguro Vehicular', '0.00%')}
+        ${readonlyField('Seguro Desgravamen', 'Con seguro')}
+        ${readonlyField('Tipo de seguro desgravamen', 'Individual')}
       </div>
     `;
   } else if (tab === 'domicilio') {
@@ -640,42 +510,15 @@ function buildOpsTabSection(tab) {
         <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Informe del proveedor Verifed y estado de conformidad de la residencia.</p>
       </div>
       <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Tipo de verificación</label>
-          <input type="text" readonly value="Física (Visita de campo)" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Proveedor</label>
-          <input type="text" readonly value="Verifed S.A.C." />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Resultado</label>
-          <input type="text" readonly value="Conforme / Verificado" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Estado</label>
-          <input type="text" readonly value="Completado" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha de verificación</label>
-          <input type="text" readonly value="16/05/2026 14:30" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Responsable</label>
-          <input type="text" readonly value="Carlos Silva (Inspector)" />
-        </div>
-        <div class="ops-readonly-field span-2">
-          <label>Dirección validada</label>
-          <input type="text" readonly value="Av. Javier Prado Este 2450 - San Borja" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Coordenadas</label>
-          <input type="text" readonly value="-12.0847, -77.0123" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Evidencia</label>
-          <input type="text" readonly value="Fotografía fachada e interiores" />
-        </div>
+        ${readonlyField('Tipo de verificación', 'Física (Visita de campo)')}
+        ${readonlyField('Proveedor', 'Verifed S.A.C.')}
+        ${readonlyField('Resultado', 'Conforme / Verificado')}
+        ${readonlyField('Estado', 'Completado')}
+        ${readonlyField('Fecha de verificación', '16/05/2026 14:30')}
+        ${readonlyField('Responsable', 'Carlos Silva (Inspector)')}
+        ${readonlyField('Dirección validada', 'Av. Javier Prado Este 2450 - San Borja', 'span-2')}
+        ${readonlyField('Coordenadas', '-12.0847, -77.0123')}
+        ${readonlyField('Evidencia', 'Fotografía fachada e interiores')}
         <div class="ops-readonly-field span-2">
           <label>Observaciones de campo</label>
           <textarea readonly rows="3">Domicilio verificado plenamente. Se confirmó que el cliente reside en la dirección declarada, coincidiendo con el DNI and recibos de servicios presentados.</textarea>
@@ -683,207 +526,114 @@ function buildOpsTabSection(tab) {
       </div>
     `;
   } else if (tab === 'cliente') {
-    const parts = nameCli.split(' ');
-    const emailVal = parts.length >= 2 
-      ? `${normalize(parts[0])}.${normalize(parts[1])}@email.com`
-      : 'carlos.perez@email.com';
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Datos de Cliente</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Información de identificación y datos personales del solicitante.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Datos de Cliente</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Tipo de documento</label>
-          <input type="text" readonly value="DNI" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Número de documento</label>
-          <input type="text" readonly value="${numDoc}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Nombres</label>
-          <input type="text" readonly value="${parts[0]} ${parts[1] || ''}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Apellido paterno</label>
-          <input type="text" readonly value="${parts.slice(-2)[0] || ''}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Apellido materno</label>
-          <input type="text" readonly value="${parts.slice(-1)[0] || ''}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha de nacimiento</label>
-          <input type="text" readonly value="15/05/1995" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Sexo</label>
-          <input type="text" readonly value="Masculino" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Número de celular</label>
-          <input type="text" readonly value="987654321" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Correo electrónico</label>
-          <input type="text" readonly value="${emailVal}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Nacionalidad</label>
-          <input type="text" readonly value="Peruana" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Residencia</label>
-          <input type="text" readonly value="Perú" />
-        </div>
-        <div class="ops-readonly-field span-2">
-          <label>Dirección de domicilio</label>
-          <input type="text" readonly value="Av. Javier Prado Este 2450 - San Borja" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Departamento</label>
-          <input type="text" readonly value="Lima" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Provincia</label>
-          <input type="text" readonly value="Lima" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Distrito</label>
-          <input type="text" readonly value="San Borja" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Estado civil</label>
-          <input type="text" readonly value="${estadoCivil}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Separación de bienes</label>
-          <input type="text" readonly value="No" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Tipo de documento', 'DNI')}
+        ${readonlyField('Número documento', '70569533')}
+        ${readonlyField('Nombres', 'Juan')}
+        ${readonlyField('Apellido paterno', 'Pérez')}
+        ${readonlyField('Apellido materno', 'García')}
+        ${readonlyField('Segmento de riesgo', 'A')}
+        ${readonlyField('Fecha de nacimiento', '11/05/1995')}
+        ${readonlyField('Número de celular *', '988569966')}
+        ${readonlyField('Correo electrónico *', 'prueba@gmail.com')}
+        ${readonlyField('Sexo', 'Masculino')}
+        ${readonlyField('Nacionalidad', 'Peruano')}
+        ${readonlyField('Residencia', 'Permanente')}
+        ${readonlyField('Dirección de domicilio *', 'AVI Las moras 123', 'span-full')}
+        ${readonlyField('Departamento *', 'LIMA')}
+        ${readonlyField('Provincia *', 'CAÑETE')}
+        ${readonlyField('Distrito *', 'SAN VICENTE')}
+        ${readonlyField('Estado civil *', 'Casado(a)')}
+        ${readonlyField('Mancomuna ingresos', 'Sí')}
+        ${readonlyField('Separación de bienes', 'No')}
+      </div>
+    `;
+  } else if (tab === 'conyuge') {
+    html = `
+      <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Datos de Cónyuge</h3>
+      </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Tipo de documento', 'DNI')}
+        ${readonlyField('Número documento', '705269833')}
+        ${readonlyField('Nombres', 'Maria')}
+        ${readonlyField('Apellido paterno', 'Flores')}
+        ${readonlyField('Apellido materno', 'Gomez')}
+        ${readonlyField('Fecha de nacimiento', '01/01/2001')}
+        ${readonlyField('Nacionalidad', 'Peruana')}
       </div>
     `;
   } else if (tab === 'laborales') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Datos Laborales</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Actividad económica, ingresos declarados y empleador del titular.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Datos Laborales</h3>
       </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Perfil</label>
-          <input type="text" readonly value="Formal" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Situación laboral</label>
-          <input type="text" readonly value="Dependiente" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Tipo de ingreso</label>
-          <input type="text" readonly value="Quinta Categoría" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Oficio / profesión</label>
-          <input type="text" readonly value="Supervisor de Operaciones" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha ingreso laboral</label>
-          <input type="text" readonly value="12/03/2018" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>RUC empleador</label>
-          <input type="text" readonly value="20123456789" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Tipo moneda ingreso</label>
-          <input type="text" readonly value="Soles" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Ingresos netos mensuales</label>
-          <input type="text" readonly value="S/ 6,500.00" />
-        </div>
-        <div class="ops-readonly-field span-2">
-          <label>Empleador / empresa</label>
-          <input type="text" readonly value="Servicios Generales SAC" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Cargo laboral</label>
-          <input type="text" readonly value="Supervisor de Operaciones" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Capacidad de pago</label>
-          <input type="text" readonly value="S/ 4,500.00" />
-        </div>
+      <div class="ops-tab-grid risk-match-grid">
+        ${readonlyField('Categoría laboral', 'Dependiente')}
+        ${readonlyField('RUC de empleador (no obligatorio)', '20705896880')}
+        ${readonlyField('Nombre centro de laboral', 'Grupo alicorp')}
+        ${readonlyField('Dirección', 'av. lima 123')}
+        ${readonlyField('Giro o actividad', 'Comercio')}
+        ${readonlyField('Cargo', 'Empleado')}
+        ${readonlyField('Fecha ingreso laboral', '01/01/2020')}
+        ${readonlyField('Tipo moneda ingreso', 'Soles (S/)')}
+        ${readonlyField('Ingresos netos mensuales', '6000.00')}
       </div>
     `;
   } else if (tab === 'ingresos') {
     html = `
       <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Ingresos</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Ingresos declarados por el titular para la validación operativa.</p>
+        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Ingresos</h3>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Registro de ingresos declarados por el titular. Puedes añadir más de un ingreso.</p>
       </div>
       <section class="executive-request-section" style="margin: 0;">
-        <p class="section-note">Registra los ingresos declarados por el titular.</p>
-        <div class="ops-tab-grid">
+        <div class="ops-tab-grid risk-match-grid">
+          ${readonlyField('Ingreso estimado (S/.)', 'S/ 5,150.00')}
           <div class="executive-income-card">
+            <h3>Ingresos del Titular</h3>
             <span class="income-chip">Ingreso 1</span>
-            <div class="ops-tab-grid" style="padding: 0;">
-              ${readonlySelectField('Tipo de categoría', '5ta categoría', ['5ta categoría', '4ta categoría', 'Renta empresarial'])}
-              ${readonlySelectField('Perfil', 'Formal', ['Formal', 'Informal'])}
-              ${readonlySelectField('Situación laboral', 'Dependiente', ['Dependiente', 'Independiente'])}
+            <div class="ops-tab-grid risk-match-grid" style="padding: 0;">
+              ${readonlyField('Tipo de categoría', '5ta categoria')}
+              ${readonlyField('Perfil', 'Formal')}
+              ${readonlyField('Situación laboral', 'Dependiente')}
               ${readonlyField('Fecha de ingreso laboral', '01/01/2021')}
-              ${readonlyField('RUC del empleador', '20705695330')}
-              ${readonlyField('Ingreso neto mensual', 'S/ 20,000.00')}
-              ${readonlySelectField('¿Ingreso anualizado?', 'Sí', ['Sí', 'No'])}
+              ${readonlyField('RUC del empleador', '20105698330')}
+              ${readonlyField('Ingreso neto mensual', 'S/ 5,500.00')}
+              ${readonlyField('¿Ingreso anualizado?', 'No')}
+            </div>
+            <div class="executive-income-total">
+              <span>Total ingresos titular:</span>
+              <strong>S/ 5,500.00</strong>
             </div>
           </div>
-          <div class="executive-income-total">
-            <span>Total ingresos titular:</span>
-            <strong>S/ 20,000.00</strong>
+          <div class="executive-income-card">
+            <h3>Ingresos del Conyuge</h3>
+            <p class="section-note">Registra los ingresos declarados por el conyuge o conviviente. Puedes añadir más de un ingreso.</p>
+            <span class="income-chip">Ingreso 1</span>
+            <div class="ops-tab-grid risk-match-grid" style="padding: 0;">
+              ${readonlyField('Tipo de categoría', '4ta categoria')}
+              ${readonlyField('Perfil', 'Formal')}
+              ${readonlyField('Situación laboral', 'Dependiente')}
+              ${readonlyField('Fecha de ingreso laboral', '03/01/2023')}
+              ${readonlyField('RUC del empleador', '20785698000')}
+              ${readonlyField('Ingreso neto mensual', 'S/ 1,500.00')}
+              ${readonlyField('¿Ingreso anualizado?', 'No')}
+            </div>
+            <div class="executive-income-total">
+              <span>Total ingresos conyuge:</span>
+              <strong>S/ 1,500.00</strong>
+            </div>
+          </div>
+          <div class="executive-income-total risk-final-total">
+            <span>Total ingresos titular + conyuge:</span>
+            <strong>S/ 7,000.00</strong>
           </div>
         </div>
       </section>
-    `;
-  } else if (tab === 'conyuge') {
-    html = `
-      <div class="tab-title-container" style="margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-        <h3 style="margin: 0; color: #002d72; font-size: 1.4rem; font-weight: 800;">Datos de Cónyuge</h3>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Información personal de la pareja.</p>
-      </div>
-      <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Tipo documento cónyuge</label>
-          <input type="text" readonly value="DNI" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>N° documento cónyuge</label>
-          <input type="text" readonly value="45879812" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Nombres cónyuge</label>
-          <input type="text" readonly value="María Fernanda" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Apellido paterno cónyuge</label>
-          <input type="text" readonly value="López" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Apellido materno cónyuge</label>
-          <input type="text" readonly value="Torres" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Fecha de nacimiento</label>
-          <input type="text" readonly value="20/11/1988" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Sexo cónyuge</label>
-          <input type="text" readonly value="Femenino" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Nacionalidad cónyuge</label>
-          <input type="text" readonly value="Peruana" />
-        </div>
-      </div>
     `;
   } else if (tab === 'riesgos') {
     html = `
@@ -892,46 +642,16 @@ function buildOpsTabSection(tab) {
         <p style="margin: 4px 0 0; color: #64748b; font-size: 0.9rem;">Condiciones de la preaprobación y políticas de PLAFT de la evaluación de Riesgos.</p>
       </div>
       <div class="ops-tab-grid">
-        <div class="ops-readonly-field">
-          <label>Resultado</label>
-          <input type="text" readonly value="Aprobado" style="font-weight: 800; color: #16a34a;" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Carretera asignada</label>
-          <input type="text" readonly value="${carretera}" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Segmento</label>
-          <input type="text" readonly value="A" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Monto preaprobado</label>
-          <input type="text" readonly value="S/ 150,000.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Capacidad máxima</label>
-          <input type="text" readonly value="S/ 5,000.00" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Cuota inicial mínima</label>
-          <input type="text" readonly value="10%" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Marca PEP</label>
-          <input type="text" readonly value="No" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>PLAFT</label>
-          <input type="text" readonly value="Conforme" />
-        </div>
-        <div class="ops-readonly-field">
-          <label>Analista</label>
-          <input type="text" readonly value="mfloresz" />
-        </div>
-        <div class="ops-readonly-field span-2">
-          <label>Fecha evaluación</label>
-          <input type="text" readonly value="16/05/2026 10:15" />
-        </div>
+        ${readonlyField('Resultado', 'Aprobado')}
+        ${readonlyField('Carretera asignada', carretera)}
+        ${readonlyField('Segmento', 'A')}
+        ${readonlyField('Monto preaprobado', 'S/ 150,000.00')}
+        ${readonlyField('Capacidad máxima', 'S/ 5,000.00')}
+        ${readonlyField('Cuota inicial mínima', '10%')}
+        ${readonlyField('Marca PEP', 'No')}
+        ${readonlyField('PLAFT', 'Conforme')}
+        ${readonlyField('Analista', 'mfloresz')}
+        ${readonlyField('Fecha evaluación', '16/05/2026 10:15', 'span-2')}
         <div class="ops-readonly-field span-2">
           <label>Comentarios</label>
           <textarea readonly rows="3">Aprobado sin excepciones en el comité de créditos. Cuenta con buen comportamiento de pago y ratios financieros óptimos.</textarea>
@@ -948,7 +668,7 @@ function renderOpsTab(tab) {
 
   if (tab === 'comerciales') {
     html = [
-      buildOpsTabSection('comerciales'),
+      buildOpsTabSection('vehiculo'),
       buildOpsTabSection('credito'),
       buildOpsTabSection('gastos'),
       buildOpsTabSection('seguros')
@@ -956,12 +676,10 @@ function renderOpsTab(tab) {
   } else if (tab === 'cliente') {
     const bloquesCliente = [
       buildOpsTabSection('cliente'),
+      buildOpsTabSection('conyuge'),
       buildOpsTabSection('laborales'),
       buildOpsTabSection('ingresos')
     ];
-    if (!currentCase || currentCase.estadoCivil === 'Casado') {
-      bloquesCliente.push(buildOpsTabSection('conyuge'));
-    }
     html = bloquesCliente.join('<div class="ops-group-divider"></div>');
   } else {
     html = buildOpsTabSection(tab);
@@ -1423,12 +1141,7 @@ function openDetail(id){
 
   $('detailSolicitud').textContent=currentCase.solicitud;
   if($('detailCarretera'))$('detailCarretera').textContent=currentCase.carretera;
-  if($('detailSLA')){
-    const isExpired=expired(currentCase.sla);
-    $('detailSLA').textContent=isExpired?'Caducado':currentCase.sla;
-    $('detailSLA').style.color=isExpired?'#dc2626':'#16a34a';
-  }
-  $('detailSubtitle').textContent=`${currentCase.cliente} · ${currentCase.documento}`;
+$('detailSubtitle').textContent=`${currentCase.cliente} · ${currentCase.documento}`;
   
   bandejaView.classList.add('hidden');
   detailView.classList.remove('hidden');
